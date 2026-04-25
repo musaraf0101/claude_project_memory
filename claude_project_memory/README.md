@@ -65,30 +65,70 @@ Your Workflow:
 
 ---
 
+## Requirements
+
+- [VS Code](https://code.visualstudio.com/) 1.74 or later
+- [Node.js](https://nodejs.org/) 18 or later (only needed if building from source)
+
+---
+
 ## Installation
 
-### From the Marketplace _(coming soon)_
+### Option A — From the Marketplace _(coming soon)_
 
 1. Open VS Code
 2. Press `Ctrl+P`
 3. Type `ext install claude-project-memory`
 4. Press Enter
 
-### Manual install (.vsix)
+### Option B — Manual install (.vsix)
 
 ```bash
 code --install-extension claude-project-memory-1.0.0.vsix
 ```
 
-### From source
+Or install via the VS Code UI:
+
+1. Open VS Code
+2. Go to **Extensions** sidebar (`Ctrl+Shift+X`)
+3. Click the `···` menu at the top right of the Extensions panel
+4. Select **Install from VSIX...**
+5. Pick the downloaded `.vsix` file
+
+### Option C — Build from Source (Developers)
 
 ```bash
 git clone https://github.com/yourusername/claude-project-memory.git
 cd claude-project-memory
 npm install
 npm run compile
-# Press F5 in VS Code to launch the Extension Development Host
 ```
+
+Then press **F5** in VS Code to launch the Extension Development Host and test it live.
+
+To package into a `.vsix`:
+
+```bash
+npx vsce package
+```
+
+---
+
+## Verify the Extension is Running
+
+Once installed and a workspace is open, you should see this in the bottom-right status bar:
+
+```
+🗄 Claude Memory
+```
+
+After saving a file or logging a task it updates to:
+
+```
+🗄 Claude Memory (2 tasks, 5 files)
+```
+
+If you don't see it, open the Command Palette (`Ctrl+Shift+P`) and search for **Claude Memory** — any command appearing confirms the extension is active.
 
 ---
 
@@ -96,11 +136,7 @@ npm run compile
 
 ### Step 1 — Just code
 
-Open any project. The extension activates automatically and starts tracking in the background. A status bar item appears in the bottom-right corner:
-
-```
-$(database) Claude Memory (3 tasks, 12 files)
-```
+Open any project. The extension activates automatically and starts tracking in the background.
 
 ### Step 2 — Log what you finish _(optional but recommended)_
 
@@ -116,7 +152,7 @@ When you need to start a fresh Claude chat:
 
 > **Command Palette → Claude Memory: Continue in New Chat**
 
-The prompt is copied to your clipboard. Paste it as the first message in the new chat. Claude will have full context and can continue without any project scan.
+The prompt is copied to your clipboard. Paste it as the first message in the new chat.
 
 **Example of a generated prompt:**
 
@@ -155,19 +191,100 @@ Continue helping — no full project scan needed!
 
 ## Commands
 
-All commands are available via the Command Palette (`Ctrl+Shift+P`):
+All commands are available via the **Command Palette** (`Ctrl+Shift+P`). Type `Claude Memory` to filter them.
 
-| Command                                 | Description                                      |
-| --------------------------------------- | ------------------------------------------------ |
-| **Claude Memory: Continue in New Chat** | Copies the full continuation prompt to clipboard |
-| **Claude Memory: Save Progress**        | Log a task you just completed                    |
-| **Claude Memory: Record Decision**      | Save an architectural decision                   |
-| **Claude Memory: Set Current Task**     | Set what you're actively working on              |
-| **Claude Memory: View Memory**          | Open the memory viewer panel                     |
-| **Claude Memory: Reset Memory**         | Clear all saved context for this project         |
+**Keyboard shortcut:** `Ctrl+Shift+Alt+C` (Windows/Linux) · `Cmd+Shift+Alt+C` (Mac)
 
-**Keyboard shortcut:** `Ctrl+Shift+Alt+C` (Windows/Linux) · `Cmd+Shift+Alt+C` (Mac)  
-You can rebind this in **File → Preferences → Keyboard Shortcuts**.
+---
+
+### Continue in New Chat
+
+**Command:** `Claude Memory: Continue in New Chat`  
+**Shortcut:** `Ctrl+Shift+Alt+C`
+
+Generates a full context prompt and copies it to your clipboard. Paste it as the first message in a new Claude chat — Claude will continue from exactly where you left off with no re-explaining needed.
+
+**When to use:** Whenever you hit the Claude 200-message limit, start a fresh session, or return after a computer restart.
+
+---
+
+### Save Progress
+
+**Command:** `Claude Memory: Save Progress`
+
+Opens an input box. Type a short description of what you just completed. Stored under **RECENTLY COMPLETED** in every future continuation prompt.
+
+**Examples:**
+```
+Implemented JWT authentication
+Created the user registration API
+Fixed the password reset email bug
+```
+
+**When to use:** After finishing any meaningful piece of work — before switching tasks, taking a break, or ending the day.
+
+---
+
+### Record Decision
+
+**Command:** `Claude Memory: Record Decision`
+
+Opens an input box. Type an architectural or technical decision you made. Stored under **KEY DECISIONS MADE** in every future prompt.
+
+**Examples:**
+```
+Using JWT stored in httpOnly cookies, not localStorage
+Chose Prisma over raw SQL for type safety
+Storing images in S3, serving via CloudFront
+```
+
+**When to use:** Any time you make a choice that would be painful to re-explain — auth strategy, database design, third-party services.
+
+---
+
+### Set Current Task
+
+**Command:** `Claude Memory: Set Current Task`
+
+Opens an input box pre-filled with your current task. Update it to describe what you're actively working on. Appears at the top of every continuation prompt under **CURRENT TASK**.
+
+**Examples:**
+```
+Building the email verification flow
+Fixing the signup form validation bug
+Writing tests for the payment module
+```
+
+**When to use:** At the start of each work session, or whenever you switch to a new task. To clear it, open the command and delete the text before confirming.
+
+---
+
+### View Memory
+
+**Command:** `Claude Memory: View Memory`  
+**Status bar:** Click the `🗄 Claude Memory` item in the bottom-right
+
+Opens a panel showing everything the extension has captured:
+
+| Section | What it shows |
+|---|---|
+| **Tech Stack** | Auto-detected frameworks and libraries |
+| **Current Task** | What you set as your active task |
+| **Completed Tasks** | Your logged progress entries |
+| **Key Decisions** | Your recorded architectural decisions |
+| **Recent Files** | Files modified, with timestamps and save counts |
+
+---
+
+### Reset Memory
+
+**Command:** `Claude Memory: Reset Memory`
+
+Shows a confirmation dialog, then clears all saved context for the current project. The `.claude-memory/project-map.json` file is reset to a blank state.
+
+**When to use:** When starting a completely new phase of the project, or if the saved context has become outdated.
+
+> **Note:** This only affects the current workspace. Other projects are not affected.
 
 ---
 
@@ -181,7 +298,14 @@ your-project/
     └── project-map.json    ← all context (tech stack, tasks, files, decisions)
 ```
 
-You can commit `.claude-memory/` to share context with your team, or add it to `.gitignore` to keep it private.
+`project-map.json` is a plain JSON file — you can open and read it at any time.
+
+**To share context with your team:** commit `.claude-memory/` to git.  
+**To keep it private:** add this line to your `.gitignore`:
+
+```
+.claude-memory/
+```
 
 ---
 
@@ -189,18 +313,44 @@ You can commit `.claude-memory/` to share context with your team, or add it to `
 
 Auto-detected from config files in your workspace root:
 
-| File                                  | Detected Stacks                                                                                                                                                                     |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `package.json`                        | Node.js, Next.js, React, Vue, Angular, Svelte, Express, NestJS, Fastify, TypeScript, Prisma, Drizzle, tRPC, Tailwind, GraphQL, Socket.io, Electron, React Native, Jest, Vitest, Zod |
-| `requirements.txt` / `pyproject.toml` | Python, Django, Flask, FastAPI, SQLAlchemy, Pandas, NumPy, TensorFlow, PyTorch                                                                                                      |
-| `go.mod`                              | Go, Gin, Fiber, Gorilla Mux, GORM                                                                                                                                                   |
-| `Cargo.toml`                          | Rust, Actix Web, Axum, Tokio, Diesel                                                                                                                                                |
-| `pubspec.yaml`                        | Flutter/Dart                                                                                                                                                                        |
-| `pom.xml`                             | Java/Maven, Spring Boot                                                                                                                                                             |
-| `build.gradle`                        | Java/Gradle, Kotlin, Android, Spring Boot                                                                                                                                           |
-| `composer.json`                       | PHP, Laravel, Symfony                                                                                                                                                               |
-| `mix.exs`                             | Elixir, Phoenix                                                                                                                                                                     |
-| `Gemfile`                             | Ruby, Ruby on Rails, Sinatra                                                                                                                                                        |
+| File | Detected Stacks |
+|---|---|
+| `package.json` | Node.js, Next.js, React, Vue, Angular, Svelte, Express, NestJS, Fastify, TypeScript, Prisma, Drizzle, tRPC, Tailwind, GraphQL, Socket.io, Electron, React Native, Jest, Vitest, Zod |
+| `requirements.txt` / `pyproject.toml` | Python, Django, Flask, FastAPI, SQLAlchemy, Pandas, NumPy, TensorFlow, PyTorch |
+| `go.mod` | Go, Gin, Fiber, Gorilla Mux, GORM |
+| `Cargo.toml` | Rust, Actix Web, Axum, Tokio, Diesel |
+| `pubspec.yaml` | Flutter/Dart |
+| `pom.xml` | Java/Maven, Spring Boot |
+| `build.gradle` | Java/Gradle, Kotlin, Android, Spring Boot |
+| `composer.json` | PHP, Laravel, Symfony |
+| `mix.exs` | Elixir, Phoenix |
+| `Gemfile` | Ruby, Ruby on Rails, Sinatra |
+
+---
+
+## Customizing the Keyboard Shortcut
+
+1. Open **File → Preferences → Keyboard Shortcuts** (`Ctrl+K Ctrl+S`)
+2. Search for `claudeMemory.continueInNewChat`
+3. Click the pencil icon and press your preferred key combination
+
+---
+
+## Uninstalling
+
+**From VS Code UI:**
+
+1. Open the Extensions sidebar (`Ctrl+Shift+X`)
+2. Search for **Claude Project Memory**
+3. Click **Uninstall**
+
+**From terminal:**
+
+```bash
+code --uninstall-extension claude-project-memory.claude-project-memory
+```
+
+The `.claude-memory/` folders inside your projects are not removed automatically. Delete them manually if needed.
 
 ---
 
@@ -222,6 +372,24 @@ Contributions are welcome!
 4. Push and open a pull request
 
 Please open an issue first for larger changes.
+
+---
+
+## Changelog
+
+### [1.0.0] — Initial Release
+
+- Auto context capture: tracks tech stack, recently modified files
+- Persistent storage in `.claude-memory/project-map.json`
+- Smart continuation prompt generation (Command Palette / keybinding)
+- Save Progress command to log completed tasks
+- Record Decision command to capture architectural choices
+- Set Current Task command
+- View Memory webview panel
+- Reset Memory command
+- Status bar indicator with task/file counts
+- First-run welcome message
+- Supports 12+ tech stacks: Node.js, Next.js, React, Vue, Angular, Express, NestJS, Python (Django/Flask/FastAPI), Go (Gin/Fiber), Rust (Actix/Axum), Flutter, Java (Maven/Gradle/Spring), PHP (Laravel/Symfony), Ruby (Rails), Elixir (Phoenix)
 
 ---
 
