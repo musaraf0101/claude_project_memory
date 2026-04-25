@@ -1,0 +1,89 @@
+{
+  "name": "claude-project-memory",
+  "displayName": "Claude Project Memory",
+  "description": "Never lose context across Claude chat resets and computer restarts. Auto-captures project state and generates smart continuation prompts.",
+  "version": "1.0.0",
+  "publisher": "claude-project-memory",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": ["Other"],
+  "keywords": ["claude", "ai", "context", "memory", "productivity", "chatgpt", "llm"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/claude-project-memory"
+  },
+  "license": "MIT",
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "claudeMemory.continueInNewChat",
+        "title": "Continue in New Chat",
+        "category": "Claude Memory",
+        "icon": "$(debug-continue)"
+      },
+      {
+        "command": "claudeMemory.saveProgress",
+        "title": "Save Progress",
+        "category": "Claude Memory",
+        "icon": "$(save)"
+      },
+      {
+        "command": "claudeMemory.recordDecision",
+        "title": "Record Decision",
+        "category": "Claude Memory",
+        "icon": "$(bookmark)"
+      },
+      {
+        "command": "claudeMemory.setCurrentTask",
+        "title": "Set Current Task",
+        "category": "Claude Memory",
+        "icon": "$(target)"
+      },
+      {
+        "command": "claudeMemory.viewMemory",
+        "title": "View Memory",
+        "category": "Claude Memory",
+        "icon": "$(database)"
+      },
+      {
+        "command": "claudeMemory.resetMemory",
+        "title": "Reset Memory",
+        "category": "Claude Memory",
+        "icon": "$(trash)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "claudeMemory.continueInNewChat",
+        "key": "ctrl+shift+alt+c",
+        "mac": "cmd+shift+alt+c"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        { "command": "claudeMemory.continueInNewChat" },
+        { "command": "claudeMemory.saveProgress" },
+        { "command": "claudeMemory.recordDecision" },
+        { "command": "claudeMemory.setCurrentTask" },
+        { "command": "claudeMemory.viewMemory" },
+        { "command": "claudeMemory.resetMemory" }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "^18.0.0",
+    "typescript": "^5.0.0",
+    "@vscode/vsce": "^2.0.0"
+  }
+}

@@ -1,0 +1,5 @@
+out/
+node_modules/
+*.vsix
+.vscode-test/
+# Do NOT gitignore .claude-memory — users may want to commit their context
